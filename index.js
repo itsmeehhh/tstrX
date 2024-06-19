@@ -1,48 +1,58 @@
-const express = require('express');
 const { exec } = require('child_process');
+const express = require('express');
 
+// تعيين المنفذ الذي يعمل عليه الخادم الحالي
+const localPort = 3000;
+const subdomain = 'your_custom_subdomain';
+
+// استخدام الأمر serve لتشغيل الخادم الحالي
+const serveProcess = exec(`serve -s build -l ${localPort}`);
+
+serveProcess.stdout.on('data', (data) => {
+    console.log(`Serve link with custom subdomain ${subdomain}: ${data}`);
+});
+
+serveProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+
+serveProcess.on('close', (code) => {
+    console.log(`Serve process exited with code ${code}`);
+});
+
+// إنشاء تطبيق Express
 const app = express();
-const port = 8080;
-const subdomain = 'ousamatester'; // تحديد معرف ثابت هنا
 
+// تعريف مسار للطلبات إلى الخادم الحالي
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+    res.send('Hello, World from local server!');
 });
 
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-  
-  const tryLocalTunnel = () => {
-    const localTunnelProcess = exec(`lt --port ${port} --subdomain ${subdomain} --allow-invalid-cert`);
-
-    localTunnelProcess.stdout.on('data', (data) => {
-      const output = data.toString().trim();
-      console.log(output);
-      if (output.startsWith('your url is:')) {
-        const localTunnelLink = output.split('your url is: ')[1];
-        console.log(`LocalTunnel link: ${localTunnelLink}`);
-      }
-    });
-
-    localTunnelProcess.stderr.on('data', (data) => {
-      const errorMessage = data.toString().trim();
-      console.error(`stderr: ${errorMessage}`);
-      const knownErrors = [
-        "Error: connection refused",
-        "localtunnel server could not be reached"
-      ];
-      if (knownErrors.some(error => errorMessage.includes(error))) {
-        console.log('Error detected, retrying...');
-        localTunnelProcess.kill();
-        process.stdout.write('\x1Bc');
-        tryLocalTunnel();
-      }
-    });
-
-    localTunnelProcess.on('close', (code) => {
-      console.log(`LocalTunnel process exited with code ${code}`);
-    });
-  };
-
-  tryLocalTunnel();
+// بدء استماع الخادم الحالي
+app.listen(localPort, () => {
+    console.log(`Local server running on port ${localPort}`);
 });
+
+// استخدام طلب HTTP لإرسال طلب إلى الخادم الآخر
+const https = require('https');
+
+const options = {
+    hostname: `${subdomain}.serveo.net`,
+    port: 443,
+    path: '/',
+    method: 'GET'
+};
+
+const req = https.request(options, (res) => {
+    console.log(`Response from other server: ${res.statusCode}`);
+    res.setEncoding('utf8');
+    res.on('data', (chunk) => {
+        console.log(`Response body: ${chunk}`);
+    });
+});
+
+req.on('error', (error) => {
+    console.error(`Error making request to other server: ${error}`);
+});
+
+req.end();
