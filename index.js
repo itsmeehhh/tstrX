@@ -1,29 +1,30 @@
+const express = require('express');
 const { exec } = require('child_process');
-const port = 8080;
-const express = require("express");
-const app = express();
-app.get("/", function (_req, res) {
-  res.sendStatus(200);
-});
 
-let serverLinkPrinted = false;
+const app = express();
+const port = 8080;
+const subdomain = 'ousamatester'; // تحديد معرف ثابت هنا
+
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   
-  const tryLocaltunnel = () => {
-    const subdomain = 'oussamatest'; // اختر اسم نطاق مخصص
-    const localtunnelProcess = exec(`lt --port ${port} --subdomain ${subdomain}`);
+  const tryLocalTunnel = () => {
+    const localTunnelProcess = exec(`lt --port ${port} --subdomain ${subdomain} --allow-invalid-cert`);
 
-    localtunnelProcess.stdout.on('data', (data) => {
-      const localtunnelLink = data.toString().trim();
-      if (!serverLinkPrinted) {
-        console.log(`Localtunnel link: ${localtunnelLink}`);
-        serverLinkPrinted = true;
+    localTunnelProcess.stdout.on('data', (data) => {
+      const output = data.toString().trim();
+      console.log(output);
+      if (output.startsWith('your url is:')) {
+        const localTunnelLink = output.split('your url is: ')[1];
+        console.log(`LocalTunnel link: ${localTunnelLink}`);
       }
     });
 
-    localtunnelProcess.stderr.on('data', (data) => {
+    localTunnelProcess.stderr.on('data', (data) => {
       const errorMessage = data.toString().trim();
       console.error(`stderr: ${errorMessage}`);
       const knownErrors = [
@@ -32,21 +33,16 @@ app.listen(port, () => {
       ];
       if (knownErrors.some(error => errorMessage.includes(error))) {
         console.log('Error detected, retrying...');
-        serverLinkPrinted = false;
-        localtunnelProcess.kill();
-        
-        // تنظيف الكونسول
+        localTunnelProcess.kill();
         process.stdout.write('\x1Bc');
-        
-        // إعادة محاولة الاتصال
-        tryLocaltunnel();
+        tryLocalTunnel();
       }
     });
 
-    localtunnelProcess.on('close', (code) => {
-      console.log(`Localtunnel process exited with code ${code}`);
+    localTunnelProcess.on('close', (code) => {
+      console.log(`LocalTunnel process exited with code ${code}`);
     });
   };
 
-  tryLocaltunnel();
+  tryLocalTunnel();
 });
