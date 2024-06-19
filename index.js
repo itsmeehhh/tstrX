@@ -3,21 +3,21 @@ const express = require('express');
 
 // تعيين المنفذ الذي يعمل عليه الخادم الحالي
 const localPort = 3000;
-const subdomain = 'your_custom_subdomain';
+const subdomain = 'oussamatester';
 
-// استخدام الأمر serve لتشغيل الخادم الحالي
-const serveProcess = exec(`serve -s build -l ${localPort}`);
+// استخدام الأمر lxp لتشغيل النفق باستخدام LocalXpose
+const lxpProcess = exec(`localxpose http ${localPort} --subdomain ${subdomain}`);
 
-serveProcess.stdout.on('data', (data) => {
-    console.log(`Serve link with custom subdomain ${subdomain}: ${data}`);
+lxpProcess.stdout.on('data', (data) => {
+    console.log(`LocalXpose link with custom subdomain ${subdomain}: ${data}`);
 });
 
-serveProcess.stderr.on('data', (data) => {
+lxpProcess.stderr.on('data', (data) => {
     console.error(`stderr: ${data}`);
 });
 
-serveProcess.on('close', (code) => {
-    console.log(`Serve process exited with code ${code}`);
+lxpProcess.on('close', (code) => {
+    console.log(`LocalXpose process exited with code ${code}`);
 });
 
 // إنشاء تطبيق Express
@@ -32,27 +32,3 @@ app.get('/', (req, res) => {
 app.listen(localPort, () => {
     console.log(`Local server running on port ${localPort}`);
 });
-
-// استخدام طلب HTTP لإرسال طلب إلى الخادم الآخر
-const https = require('https');
-
-const options = {
-    hostname: `${subdomain}.serveo.net`,
-    port: 443,
-    path: '/',
-    method: 'GET'
-};
-
-const req = https.request(options, (res) => {
-    console.log(`Response from other server: ${res.statusCode}`);
-    res.setEncoding('utf8');
-    res.on('data', (chunk) => {
-        console.log(`Response body: ${chunk}`);
-    });
-});
-
-req.on('error', (error) => {
-    console.error(`Error making request to other server: ${error}`);
-});
-
-req.end();
