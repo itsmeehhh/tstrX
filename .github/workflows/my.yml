@@ -9,5 +9,5 @@ jobs:
         with:
           node-version: 18
       - run: sudo apt update && sudo apt install openssh-server
-      - run: npm install -g serve && npm i
+      - run: npm install -g localxpose && npm i
       - run: node .
