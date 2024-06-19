@@ -8,6 +8,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-      - run: sudo apt update && sudo apt install openssh-server
-      - run: npm install -g localxpose && npm i
-      - run: node .
+      - run: sudo apt update && sudo apt install -y openssh-client
+      - run: |
+          # تنزيل LocalXpose
+          wget https://github.com/localxpose/localxpose/releases/download/v2.3.3/localxpose-linux.zip
+          unzip localxpose-linux.zip -d localxpose
+          sudo mv localxpose/localxpose /usr/local/bin/lxp
+      - run: npm install
+      - run: node index.js
