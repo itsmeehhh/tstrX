@@ -8,7 +8,7 @@ app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   
   const tryTelebit = () => {
-    const telebitProcess = exec('ssh -R 80:localhost:8080 -p 5050 oussamatestse.telebit.io');
+    const telebitProcess = exec('ssh -R 80:localhost:8080 -p 8080 telebit.io');
 
     telebitProcess.stdout.on('data', (data) => {
       const telebitLink = data.toString().trim();
