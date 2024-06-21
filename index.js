@@ -1,34 +1,41 @@
 const { exec } = require('child_process');
-const express = require('express');
+const app = require('express')();
+const port = 8080;
 
-// تعيين المنفذ الذي يعمل عليه الخادم الحالي
-const localPort = 3000;
-const subdomain = 'oussamatester';
+let serverLinkPrinted = false;
 
-// استخدام الأمر lxp لتشغيل النفق باستخدام LocalXpose
-const lxpProcess = exec(`localxpose http ${localPort} --subdomain ${subdomain}`);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
+  
+  const tryTelebit = () => {
+    const telebitProcess = exec('ssh -p 5050 oussamatester.telebit.io');
 
-lxpProcess.stdout.on('data', (data) => {
-    console.log(`LocalXpose link with custom subdomain ${subdomain}: ${data}`);
-});
+    telebitProcess.stdout.on('data', (data) => {
+      const telebitLink = data.toString().trim();
+      if (!serverLinkPrinted) {
+        console.log(`Telebit link: ${telebitLink}`);
+        serverLinkPrinted = true;
+      }
+    });
 
-lxpProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
+    telebitProcess.stderr.on('data', (data) => {
+      const errorMessage = data.toString().trim();
+      console.error(`stderr: ${errorMessage}`);
+      const knownErrors = [
+        "Error: something went wrong",
+      ];
+      if (knownErrors.some(error => errorMessage.includes(error))) {
+        console.log('Error detected, retrying...');
+        serverLinkPrinted = false;
+        telebitProcess.kill();
+        tryTelebit();
+      }
+    });
 
-lxpProcess.on('close', (code) => {
-    console.log(`LocalXpose process exited with code ${code}`);
-});
+    telebitProcess.on('close', (code) => {
+      console.log(`Telebit process exited with code ${code}`);
+    });
+  };
 
-// إنشاء تطبيق Express
-const app = express();
-
-// تعريف مسار للطلبات إلى الخادم الحالي
-app.get('/', (req, res) => {
-    res.send('Hello, World from local server!');
-});
-
-// بدء استماع الخادم الحالي
-app.listen(localPort, () => {
-    console.log(`Local server running on port ${localPort}`);
+  tryTelebit();
 });
