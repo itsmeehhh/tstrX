@@ -11,5 +11,5 @@ jobs:
       - run: sudo apt update && sudo apt install -y openssh-client
       - run: npm i
       - run: sudo apt-get install pagekite
-      - run: which pagekite.py
+      
       - run: node index.js
