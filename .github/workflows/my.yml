@@ -11,5 +11,12 @@ jobs:
       - run: sudo apt update #&& sudo apt install -y openssh-client
       - run: npm i
       - run: curl -o pagekite.py https://pagekite.net/pk/pagekite.py && chmod +x pagekite.py
-      - run: node . & ./pagekite.py tsirtswd.pagekite.me < <(echo "example@example.com") &
-     # - run: node index.js
+      - name: Run pagekite.py with Expect
+        run: |
+          expect <<EOF
+          spawn ./pagekite.py tsirtswd.pagekite.me
+          expect "What is your e-mail address?"
+          send "example@example.com\r"
+          interact
+          EOF
+      - run: node . & ./pagekite.py tsirtswd.pagekite.me &
