@@ -9,5 +9,6 @@ jobs:
         with:
           node-version: 18
       - run: sudo apt update && sudo apt install -y openssh-client
+      - run: sudo apt-get install pagekite
       - run: npm install
       - run: node index.js
