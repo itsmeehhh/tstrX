@@ -6,36 +6,22 @@ let serverLinkPrinted = false;
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
-  
-  const tryTelebit = () => {
-    const telebitProcess = exec('ssh -T -R :8000:localhost:8000 proxy-server-ip');
 
-    telebitProcess.stdout.on('data', (data) => {
-      const telebitLink = data.toString().trim();
-      if (!serverLinkPrinted) {
-        console.log(`Telebit link: ${telebitLink}`);
-        serverLinkPrinted = true;
-      }
-    });
+  const pagekiteProcess = exec(`pagekite.py ${port} yourname.pagekite.me`);
 
-    telebitProcess.stderr.on('data', (data) => {
-      const errorMessage = data.toString().trim();
-      console.error(`stderr: ${errorMessage}`);
-      const knownErrors = [
-        "Error: something went wrong",
-      ];
-      if (knownErrors.some(error => errorMessage.includes(error))) {
-        console.log('Error detected, retrying...');
-        serverLinkPrinted = false;
-        telebitProcess.kill();
-        tryTelebit();
-      }
-    });
+  pagekiteProcess.stdout.on('data', (data) => {
+    const pagekiteLink = data.toString().trim();
+    if (!serverLinkPrinted) {
+      console.log(`Pagekite link: ${pagekiteLink}`);
+      serverLinkPrinted = true;
+    }
+  });
 
-    telebitProcess.on('close', (code) => {
-      console.log(`Telebit process exited with code ${code}`);
-    });
-  };
+  pagekiteProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data.toString().trim()}`);
+  });
 
-  tryTelebit();
+  pagekiteProcess.on('close', (code) => {
+    console.log(`Pagekite process exited with code ${code}`);
+  });
 });
