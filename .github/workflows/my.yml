@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-      - run: sudo apt update #&& sudo apt install -y openssh-client
+      - name: Install Node.js and npm
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nodejs npm expect
       - run: npm i
       - run: curl -o pagekite.py https://pagekite.net/pk/pagekite.py && chmod +x pagekite.py
       - name: Run pagekite.py with Expect
