@@ -8,8 +8,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 18
-     # - run: sudo apt update && sudo apt install -y openssh-client
+      - run: sudo apt update #&& sudo apt install -y openssh-client
       - run: npm i
       - run: curl -o pagekite.py https://pagekite.net/pk/pagekite.py && chmod +x pagekite.py
-      - run: ./pagekite.py 8080 yourname.pagekite.me &
-      - run: node index.js
+      - run: node . & ./pagekite.py 8080 tasirtqwd.pagekite.me &
+     # - run: node index.js
