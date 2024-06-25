@@ -25,7 +25,7 @@ async function getTunnelInfo() {
     await executeCommand(downloadCommand);
 
     // Create and configure the tunnel with auto-generated Origin Certificate
-    const createCommand = 'cloudflared tunnel create my-ostester --auto';
+    const createCommand = 'cloudflared tunnel create my-ostester';
     await executeCommand(createCommand);
 
     // Run the tunnel
