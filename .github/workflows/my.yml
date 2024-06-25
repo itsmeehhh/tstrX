@@ -8,6 +8,6 @@ jobs:
       - name: Install dependencies
         run: sudo apt-get update
       - name: Install packages
-        run: npm install && npm install cloudflared
+        run: npm install && npm install -g cloudflared
       - name: Run node.js
         run: node index.js &
