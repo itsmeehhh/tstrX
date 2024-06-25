@@ -24,7 +24,11 @@ async function getTunnelInfo() {
     const downloadCommand = 'wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared-linux-amd64.deb';
     await executeCommand(downloadCommand);
 
-    // Create and configure the tunnel
+    // Login to Cloudflare to fetch Origin Certificate
+    const loginCommand = 'cloudflared tunnel login';
+    await executeCommand(loginCommand);
+
+    // Create and configure the tunnel with fetched Origin Certificate
     const createCommand = 'cloudflared tunnel create my-tunnel';
     await executeCommand(createCommand);
 
