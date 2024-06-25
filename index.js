@@ -21,7 +21,7 @@ function executeCommand(command) {
 async function getTunnelInfo() {
   try {
     // Download and install Cloudflared
-    const downloadCommand = 'wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared-stable-linux-amd64.deb';
+    const downloadCommand = 'wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared-linux-amd64.deb';
     await executeCommand(downloadCommand);
 
     // Create and configure the tunnel
