@@ -24,23 +24,19 @@ async function getTunnelInfo() {
     const downloadCommand = 'wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb && sudo dpkg -i cloudflared-linux-amd64.deb';
     await executeCommand(downloadCommand);
 
-    // Login to Cloudflare to fetch Origin Certificate
-    const loginCommand = 'cloudflared tunnel login';
-    await executeCommand(loginCommand);
-
-    // Create and configure the tunnel with fetched Origin Certificate
-    const createCommand = 'cloudflared tunnel create my-tunnel';
+    // Create and configure the tunnel with auto-generated Origin Certificate
+    const createCommand = 'cloudflared tunnel create my-ostester --auto';
     await executeCommand(createCommand);
 
     // Run the tunnel
-    const runCommand = 'cloudflared tunnel run my-tunnel &';
+    const runCommand = 'cloudflared tunnel run my-ostester &';
     await executeCommand(runCommand);
 
     // Wait for the tunnel to establish (adjust sleep time as needed)
     await new Promise(resolve => setTimeout(resolve, 10000));
 
     // Get tunnel info
-    const infoCommand = 'cloudflared tunnel info my-tunnel';
+    const infoCommand = 'cloudflared tunnel info my-ostester';
     const infoOutput = await executeCommand(infoCommand);
 
     // Extract endpoint URL from the info (assuming it follows a specific format)
