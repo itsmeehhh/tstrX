@@ -1,40 +1,63 @@
+const { exec } = require('child_process');
 const express = require('express');
-const app = express();
-const port = 8080;
 
+const app = express();
+const port = 3000;
+
+// Function to execute shell commands asynchronously
+function executeCommand(command) {
+  return new Promise((resolve, reject) => {
+    exec(command, (error, stdout, stderr) => {
+      if (error) {
+        reject(`exec error: ${error}`);
+        return;
+      }
+      resolve(stdout.trim());
+    });
+  });
+}
+
+// Function to get tunnel information
+async function getTunnelInfo() {
+  try {
+    // Download and install Cloudflared
+    const downloadCommand = 'wget https://bin.equinox.io/c/VdrWdbjqyF/cloudflared-stable-linux-amd64.deb && sudo dpkg -i cloudflared-stable-linux-amd64.deb';
+    await executeCommand(downloadCommand);
+
+    // Create and configure the tunnel
+    const createCommand = 'cloudflared tunnel create my-tunnel';
+    await executeCommand(createCommand);
+
+    // Run the tunnel
+    const runCommand = 'cloudflared tunnel run my-tunnel &';
+    await executeCommand(runCommand);
+
+    // Wait for the tunnel to establish (adjust sleep time as needed)
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
+    // Get tunnel info
+    const infoCommand = 'cloudflared tunnel info my-tunnel';
+    const infoOutput = await executeCommand(infoCommand);
+
+    // Extract endpoint URL from the info (assuming it follows a specific format)
+    const endpointUrl = infoOutput.match(/https:\/\/[\w./?=+-]+/)[0];
+
+    // Print the endpoint URL to console
+    console.log('Cloudflare Tunnel URL:');
+    console.log(endpointUrl);
+
+  } catch (err) {
+    console.error('Error:', err);
+  }
+}
+
+// Route to handle root URL
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-app.listen(port, () => {
+// Start the server and get tunnel info
+app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
+  await getTunnelInfo();
 });
-
-/*const { exec } = require('child_process');
-const app = require('express')();
-const port = 8080;
-
-let serverLinkPrinted = false;
-
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
-
-  const pagekiteProcess = exec(`pagekite.py ${port} yourname.pagekite.me`);
-
-  pagekiteProcess.stdout.on('data', (data) => {
-    const pagekiteLink = data.toString().trim();
-    if (!serverLinkPrinted) {
-      console.log(`Pagekite link: ${pagekiteLink}`);
-      serverLinkPrinted = true;
-    }
-  });
-
-  pagekiteProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data.toString().trim()}`);
-  });
-
-  pagekiteProcess.on('close', (code) => {
-    console.log(`Pagekite process exited with code ${code}`);
-  });
-});
-*/
