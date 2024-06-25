@@ -6,20 +6,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y nodejs npm expect
-      - name: Install Node.js packages
+        run: sudo apt-get update
+      - name: Install packages
         run: npm install
-      - name: Download and set up pagekite.py
-        run: |
-          curl -o pagekite.py https://pagekite.net/pk/pagekite.py
-          chmod +x pagekite.py
-      - name: Run pagekite.py with Expect and node.js
-        run: |
-          nohup expect -c "
-          spawn ./pagekite.py tsirtswd.pagekite.me
-          expect \\"What is your e-mail address?\\"
-          send \\"example@example.com\r\\"
-          interact
-          " & nohup node index.js &
+      - name: Run node.js
+        run: node index.js &
