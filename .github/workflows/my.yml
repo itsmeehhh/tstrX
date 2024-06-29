@@ -1,4 +1,3 @@
-من بعد دير هادي ف workflows 
 
 name: Run nodejs index.js
 on: [push]
