@@ -2,27 +2,24 @@ const express = require('express');
 const { exec } = require('child_process');
 
 const app = express();
+const PORT = 3000;
 
-// Route handler
 app.get('/', (req, res) => {
-  res.send('Hello, world!');
+  res.send('Hello World');
 });
 
-// Start server and execute command
-const server = app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 
-  // Execute command to create tunnel
-  exec('echo "abcd:8080" | nc 2a924f8b-fa5b-4138-aec8-5f7cc3dcf2ab-00-15m0i147x074o.picard.replit.dev 2222', (err, stdout, stderr) => {
-  if (err) {
-    console.error('Error executing command:', err);
-    return;
-  }
-  console.log('Command executed successfully:', stdout);
-});
-});
-
-// Handle server errors
-server.on('error', (err) => {
-  console.error('Server error:', err);
+  exec(`ssh -R 80:localhost:8080 tester920.localhost.run`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`stderr: ${stderr}`);
+      return;
+    }
+    console.log(`Public URL: ${stdout}`);
+  });
 });
