@@ -1,3 +1,5 @@
+من بعد دير هادي ف workflows 
+
 name: Run nodejs index.js
 on: [push]
 jobs:
@@ -5,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install dependencies
-        run: sudo apt-get update
-      - name: Install packages
-        run: npm install
-      - name: Run node.js
-        run: node index.js &
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: sudo apt update && sudo apt install openssh-server
+      - run: npm i
+      - run: node .
