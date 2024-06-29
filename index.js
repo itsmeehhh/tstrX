@@ -1,37 +1,28 @@
-const { spawn } = require('child_process');
 const express = require('express');
+const { exec } = require('child_process');
 
 const app = express();
-const port = 3000;
 
-// اسم النفق الثابت
-const tunnelName = 'my-tunnel';
-
+// Route handler
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.send('Hello, world!');
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+// Start server and execute command
+const server = app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 
-  // تشغيل النفق باستخدام cloudflared ومعرف النفق الثابت
-  const cloudflared = spawn('cloudflared', ['tunnel', 'run', tunnelName]);
-
-  cloudflared.stdout.on('data', (data) => {
-    const output = data.toString();
-    console.log(output);
-
-    const match = output.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/);
-    if (match) {
-      console.log(`Cloudflare Tunnel URL: ${match[0]}`);
+  // Execute command to create tunnel
+  exec('echo "abcd:8080" | nc 2a924f8b-fa5b-4138-aec8-5f7cc3dcf2ab-00-15m0i147x074o.picard.replit.dev:3001 2222', (err, stdout, stderr) => {
+    if (err) {
+      console.error('Error executing command:', err);
+      return;
     }
+    console.log('Command executed successfully:', stdout);
   });
+});
 
-  cloudflared.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-  });
-
-  cloudflared.on('close', (code) => {
-    console.log(`cloudflared process exited with code ${code}`);
-  });
+// Handle server errors
+server.on('error', (err) => {
+  console.error('Server error:', err);
 });
