@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 
-  exec(`chmod 600 ./0 && ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -R 80:localhost:3000 -i ./0 tester920@ssh.localhost.run`, (error, stdout, stderr) => {
+  exec(`ssh -R 80:localhost:3000 localhost.run`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error: ${error.message}`);
       return;
