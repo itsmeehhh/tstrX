@@ -11,7 +11,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 
-  exec(`ssh -tt -i "./0" -o StrictHostKeyChecking=no -R fb-trt:80:localhost:3000 2a924f8b-fa5b-4138-aec8-5f7cc3dcf2ab-00-15m0i147x074o.picard.replit.dev`, (error, stdout, stderr) => {
+  exec(`ssh -tt -i "./0" -o StrictHostKeyChecking=no -R fb-trt:80:localhost:3000 serveo.webflow.io`, (error, stdout, stderr) => {
     if (error) {
       console.error(`Error: ${error.message}`);
       return;
