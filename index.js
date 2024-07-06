@@ -12,7 +12,7 @@ let serverLinkPrinted = false;
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   const trySSH = () => {
-    const serveoProcess = exec('ssh -tt -i "./0" -o StrictHostKeyChecking=no -R os-tstr:80:localhost:8080 serveo.webflow.io');
+    const serveoProcess = exec('ssh -tt -i "./0" -o StrictHostKeyChecking=no -R os-tstr:80:localhost:8080 serveo.net');
 
     serveoProcess.stdout.on('data', (data) => {
       const serveoLink = data.toString().trim();
